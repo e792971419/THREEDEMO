@@ -2,7 +2,7 @@
  * @Author: your name
  * @LastEditors: xiasong
  * @Date: 2021-01-06 17:09:10
- * @LastEditTime: 2021-01-06 18:06:10
+ * @LastEditTime: 2021-01-07 09:25:27
  * @Description: description
  * @FilePath: \THREEDEMO\src\index.html
 -->
@@ -96,7 +96,7 @@
 
       function animate() {
         let T1 = new Date();
-        let t = T1 - T0; // 再次执行 渲染函数的 是 16 或 17
+        let t = T1 - T0; // 再次执行 渲染函数的时间间隔 是 16 或 17
         T0 = T1;
         requestAnimationFrame(animate); // 请求再次执行渲染函数
         renderer.render(scene, camera); // 执行 渲染操作

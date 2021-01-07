@@ -1,0 +1,107 @@
+<!--
+ * @Author: your name
+ * @LastEditors: xiasong
+ * @Date: 2021-01-06 17:09:10
+ * @LastEditTime: 2021-01-07 18:04:02
+ * @Description: description
+ * @FilePath: \THREEDEMO\src\demo1.html
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden; /* 隐藏body 窗口区域的滚动条 */
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // 通过访问 https://unpkg.com/three 来查找最新版本。
+      // 该URL将会重定向到最新的稳定版本。
+      import * as THREE from "https://unpkg.com/three/build/three.module.js";
+
+      import { OrbitControls } from "https://unpkg.com/three/examples/jsm/controls/OrbitControls.js";
+      import { GUI } from "https://unpkg.com/three/examples/jsm/libs/dat.gui.module.js";
+
+      const point = new THREE.Vector3();
+
+      /**
+       * 创建场景对象
+       */
+      var scene = new THREE.Scene();
+
+      /**
+       * 创建网格
+       * GridHelper( size : number, divisions : Number, colorCenterLine : Color, colorGrid : Color )
+       * size -- 坐标格尺寸. 默认为 10.
+       * divisions -- 坐标格细分次数. 默认为 10.
+       * colorCenterLine -- 中线颜色. 值可以为 Color 类型, 16进制 和 CSS 颜色名. 默认为 0x444444
+       * colorGrid -- 坐标格网格线颜色. 值可以为 Color 类型, 16进制 和 CSS 颜色名. 默认为 0x888888
+       * 创建一个尺寸为 'size' 和 每个维度细分 'divisions' 次的坐标格. 颜色可选.
+       */
+      const helper = new THREE.GridHelper(2000, 100);
+      helper.position.y = -199;
+      helper.material.opacity = 0.25;
+      helper.material.transparent = true;
+      scene.add(helper);
+
+      /**
+       * 相机设置
+       */
+      var width = window.innerWidth; //窗口宽度
+      var height = window.innerHeight; //窗口高度
+      var k = width / height; //窗口宽高比
+      var s = 100; //三维场景缩放系数
+      //创建相机对象
+      //   var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+      var camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000
+      );
+      camera.position.set(0, 650, 1000); //设置相机位置
+      camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+      /**
+       * 创建渲染器对象
+       */
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height);
+      renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+      renderer.shadowMap.enabled = true;
+      document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+
+      //   const gui = new GUI();
+      //   gui.add(params, "addPoint");
+      //   gui.open();
+
+      const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      // Controls
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.damping = 0.2;
+      controls.addEventListener("change", render);
+
+      function animate() {
+        requestAnimationFrame(animate); // 请求再次执行渲染函数
+        render(); // 执行 渲染操作
+      }
+
+      function render() {
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>

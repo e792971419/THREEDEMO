@@ -1,0 +1,354 @@
+<!--
+ * @Author: your name
+ * @LastEditors: xiasong
+ * @Date: 2021-01-11 11:09:18
+ * @LastEditTime: 2021-01-11 18:10:01
+ * @Description: description
+ * @FilePath: \Code\THREEDEMO\src\misc_controls_transform.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden; /* 隐藏body 窗口区域的滚动条 */
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // 通过访问 https://unpkg.com/three 来查找最新版本。
+      // 该URL将会重定向到最新的稳定版本。
+      import * as THREE from "../node_modules/three/build/three.module.js";
+
+      // 引入 轨道控制器
+      import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
+      // 引入 变换控制器
+      import { TransformControls } from "../node_modules/three/examples/jsm/controls/TransformControls.js";
+
+      let cameraPersp, cameraOrtho, currentCamera;
+      let scene, renderer, control, orbit;
+
+      init();
+      render();
+
+      function init() {
+        // 实例一个 渲染器
+        renderer = new THREE.WebGLRenderer();
+
+        // 设置设备像素比
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // 设置输出的 canvas 的大小
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // 将 渲染器 插入到 body 中
+        document.body.appendChild(renderer.domElement);
+
+        // 设置 一个 视口的 长宽比
+        const aspect = window.innerWidth / window.innerHeight;
+
+        // 实例一个 透视相机
+        /**
+         * PerspectiveCamera( fov : Number, aspect : Number, near : Number, far : Number )
+         * fov — 摄像机视锥体垂直视野角度
+         * aspect — 摄像机视锥体长宽比
+         * near — 摄像机视锥体近端面
+         * far — 摄像机视锥体远端面
+         */
+        cameraPersp = new THREE.PerspectiveCamera(50, aspect, 0.01, 30000);
+
+        // 实例一个 正交相机
+        /**
+         * OrthographicCamera( left : Number, right : Number, top : Number, bottom : Number, near : Number, far : Number )
+         * left — 摄像机视锥体左侧面。
+         * right — 摄像机视锥体右侧面。
+         * top — 摄像机视锥体上侧面。
+         * bottom — 摄像机视锥体下侧面。
+         * near — 摄像机视锥体近端面。
+         * far — 摄像机视锥体远端面。
+         */
+        cameraOrtho = new THREE.OrthographicCamera(
+          -600 * aspect,
+          600 * aspect,
+          600,
+          -600,
+          0.01,
+          30000
+        );
+
+        currentCamera = cameraPersp;
+
+        // 设置 相机 的位置
+        currentCamera.position.set(1000, 500, 1000);
+        // 设置 相机 看的 源点
+        currentCamera.lookAt(0, 200, 0);
+
+        // 实例一个 场景
+        scene = new THREE.Scene();
+
+        // 在 场景 中增加 坐标格辅助对象
+        /**
+         * GridHelper( size : number, divisions : Number, colorCenterLine : Color, colorGrid : Color )
+         * size -- 坐标格尺寸. 默认为 10.
+         * divisions -- 坐标格细分次数. 默认为 10.
+         * colorCenterLine -- 中线颜色. 值可以为 Color 类型, 16进制 和 CSS 颜色名. 默认为 0x444444
+         * colorGrid -- 坐标格网格线颜色. 值可以为 Color 类型, 16进制 和 CSS 颜色名. 默认为 0x888888
+         */
+        scene.add(new THREE.GridHelper(1000, 10, 0x888888, 0x444444));
+
+        /**
+         * DirectionalLight( color : Integer, intensity : Float )
+         * color - (可选参数) 16进制表示光的颜色。 缺省值为 0xffffff (白色)。
+         * intensity - (可选参数) 光照的强度。缺省值为1。
+         */
+        //  实例一个 灯光
+        const light = new THREE.DirectionalLight(0xffffff, 2);
+        // 设置 灯光 位置
+        light.position.set(1, 1, 1);
+        // 将 灯光 加入到 场景 中
+        scene.add(light);
+
+        // 加载一个 texture 的一个类
+        const texture = new THREE.TextureLoader().load(
+          "./image/textute/crate.gif",
+          render
+        );
+        /**
+         * Texture 纹理
+         * anisotropy : number
+         * 沿着轴，通过具有最高纹素密度的像素的样本数。
+         * 默认情况下，这个值为1。
+         * 设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
+         * 使用renderer.getMaxAnisotropy() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。
+         */
+        /**
+         * webGlRenderer
+         * capabilities:  一个包含当前渲染环境(RenderingContext)的功能细节的对象
+         * getMaxAnisotropy(): 返回最大可用各向异性。
+         * */
+        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+        /**
+         * BoxBufferGeometry(width : Float, height : Float, depth : Float, widthSegments : Integer, heightSegments : Integer, depthSegments : Integer)
+         * width — X轴上面的宽度，默认值为1。
+         * height — Y轴上面的高度，默认值为1。
+         * depth — Z轴上面的深度，默认值为1。
+         * widthSegments — （可选）宽度的分段数，默认值是1。
+         * heightSegments — （可选）宽度的分段数，默认值是1。
+         * depthSegments — （可选）宽度的分段数，默认值是1。
+         * */
+        //  实例一个 几何体
+        const geometry = new THREE.BoxBufferGeometry(200, 200, 200);
+
+        /**
+         * Lambert网格材质(MeshLambertMaterial)
+         * 一种非光泽表面的材质，没有镜面高光。
+         */
+        const material = new THREE.MeshLambertMaterial({
+          map: texture, // 颜色贴图
+          transparent: true, // 定义材质是否透明
+        });
+
+        /**
+         * OrbitControls( object : Camera, domElement : HTMLDOMElement )
+         * object: （必须）将要被控制的相机。该相机不允许是其他任何对象的子级，除非该对象是场景自身。
+         * domElement: 用于事件监听的HTML元素
+         */
+        orbit = new OrbitControls(currentCamera, renderer.domElement);
+        // 更新控制器 必须在摄像机的变换发生任何手动改变后调用
+        orbit.update();
+        // 监听 控制器 的改变
+        orbit.addEventListener("change", render);
+
+        /**
+         * 变换控制器
+         * TransformControls( camera : Camera, domElement : HTMLDOMElement )
+         * camera: 被控制的摄像机。
+         * domElement: 用于事件监听的HTML元素。
+         */
+        control = new TransformControls(currentCamera, renderer.domElement);
+        control.addEventListener("change", render);
+
+        // 监听 控制器 的拖拽事件
+        control.addEventListener("dragging-changed", function (event) {
+          orbit.enabled = !event.value;
+        });
+
+        // 实例一个 网格
+        const mesh = new THREE.Mesh(geometry, material);
+        // 将 网格 加入到 场景 中
+        scene.add(mesh);
+
+        /**
+         * attach ( object : Object3D ) : TransformControls
+         * object: 应当变换的3D对象。
+         * 设置应当变换的3D对象，并确保控制器UI是可见的。
+         */
+        control.attach(mesh);
+        // 将 控制器 加入到 场景 中
+        scene.add(control);
+
+        // 监听 窗口变化缩放
+        window.addEventListener("resize", onWindowResize, false);
+
+        // 监听 键盘事件
+        window.addEventListener("keydown", function (event) {
+          switch (event.keyCode) {
+            case 81: // Q
+              control.setSpace(control.space === "local" ? "world" : "local");
+              break;
+            case 16: // shift
+              control.setTranslationSnap(100); //设置 平移捕捉步幅
+              control.setRotationSnap(THREE.MathUtils.degToRad(15)); // 设置 旋转捕捉步幅
+              control.setScaleSnap(0.25);
+              break;
+            case 87: //w
+              control.setMode("translate");
+              break;
+            case 69: // e
+              control.setMode("rotate");
+              break;
+            case 82: // r
+              control.setMode("scale");
+              break;
+            case 67: // c
+              const position = currentCamera.position.clone();
+              currentCamera = currentCamera.isPerspectiveCamera
+                ? cameraOrtho
+                : cameraPersp;
+              currentCamera.position.copy(position);
+
+              // 轨道控制器  属性 object :Camera (正被控制的摄像机)
+              orbit.object = currentCamera;
+              // 交换控制器 属性 camera ：Camera (正被控制的摄像机)
+              control.camera = currentCamera;
+
+              /**
+               * 三维物体（Object3D）
+               * 方法
+               * .lookAt ( vector : Vector3 ) : null
+               * .lookAt ( x : Float, y : Float, z : Float ) : null
+               * vector - 一个表示世界空间中位置的向量。
+               * 也可以使用世界空间中x、y和z的位置分量。
+               * 旋转物体使其在世界空间中面朝一个点。
+               * 这一方法不支持其父级被旋转过或者被位移过的物体。
+               */
+              currentCamera.lookAt(
+                orbit.target.x,
+                orbit.target.y,
+                orbit.target.z
+              );
+              onWindowResize();
+              break;
+            case 86: // v
+              // 随机 透视相机的视角
+              const randomFov = Math.random() + 0.1;
+              // 随机 放大倍数
+              const randomZoom = Math.random() + 0.1;
+
+              cameraPersp.fov = randomFov * 160;
+              cameraOrtho.bottom = -randomFov * 500;
+              cameraOrtho.top = randomFov * 500;
+
+              cameraPersp.zoom = randomZoom * 5;
+              cameraOrtho.zoom = randomZoom * 5;
+              onWindowResize();
+              break;
+            case 187:
+            case 107: // +,=,num+
+              control.setSize(control.size + 0.1); // 设置 交换控制器的 大小
+              break;
+
+            case 189:
+            case 109: // -,_,num-
+              control.setSize(Math.max(control.size - 0.1, 0.1));
+              break;
+            case 88: // x
+              control.showX = !control.showX;
+              break;
+            case 89: // y
+              control.showY = !control.showY;
+              break;
+            case 90: //z
+              control.showZ = !controlz.showZ;
+              break;
+            case 32: //spacebar
+              control.enabled = !control.enabled;
+              break;
+          }
+        });
+
+        window.addEventListener("keyup", function (event) {
+          switch (event.keyCode) {
+            case 16: // shift
+              control.setTranslationSnap(null);
+              control.setRotationSnap(null);
+              control.setScaleSnap(null);
+              break;
+          }
+        });
+      }
+
+      // 监听 窗口的变化大小
+      function onWindowResize() {
+        const aspect = window.innerWidth / window.innerHeight;
+
+        cameraPersp.aspect = aspect;
+        /**
+         * .updateProjectionMatrix () : null
+         * 更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
+         */
+        cameraPersp.updateProjectionMatrix();
+
+        cameraOrtho.left = cameraOrtho.bottom * aspect;
+        cameraOrtho.right = cameraOrtho.top * aspect;
+        cameraOrtho.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        render();
+      }
+
+      function render() {
+        renderer.render(scene, currentCamera);
+      }
+    </script>
+  </body>
+</html>
+
+<!-- 
+  1. 创建一个渲染器
+    1.1 设置渲染器的 大小
+    1.2 设置渲染器的 设备像素比
+    1.3 将渲染器的domElement 插入到 body中
+  
+  2. 创建相机
+    2.1 设置相机的位置
+    2.2 设置相机的 lookAt
+  
+  3. 创建一个场景
+  
+  4. 设置一个灯管
+
+  5. 设置纹理 texture
+    5.1 纹理 load 加载对应的 3D图片 目前不确定图片到底是一个怎么样式 维度形式
+  
+  6. 设置一个 几何体
+    6.1 给几何体加上 颜色 、贴图或者颜色
+  
+  7. 设置控制器
+    7.1 轨道控制器 OrbitControls
+    7.2 交换控制器 TransformControls
+    7.3 给控制器 添加监听事件
+  
+  8. 每增加一个 物质 都得在场景中 add一下
+
+  9. 最终的渲染 renderer.render(场景，相机)
+
+
+ -->

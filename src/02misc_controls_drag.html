@@ -1,0 +1,238 @@
+<!--
+ * @Author: your name
+ * @LastEditors: xiasong
+ * @Date: 2021-01-12 09:20:24
+ * @LastEditTime: 2021-01-12 10:59:50
+ * @Description: description
+ * @FilePath: \THREEDEMO\src\02misc_controls_drag.html
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>controls_drag</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden; /* 隐藏body 窗口区域的滚动条 */
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // 通过访问 https://unpkg.com/three 来查找最新版本。
+      // 该URL将会重定向到最新的稳定版本。
+      import * as THREE from "../node_modules/three/build/three.module.js";
+
+      // 引入 拖拽控制器
+      import { DragControls } from "../node_modules/three/examples/jsm/controls/DragControls.js";
+
+      let container;
+      let camera, scene, renderer;
+      let controls, group;
+      let enableSelection = false;
+
+      const objects = [];
+      /**
+       * Vector2( x : Float, y : Float )
+       * 表示2D vector（二维向量）的类
+       * x - 向量的x值，默认为0。
+       * y - 向量的y值，默认为0。
+       */
+      /**
+       * Raycaster( origin : Vector3, direction : Vector3, near : Float, far : Float )
+       * 这个类用于进行raycasting（光线投射）
+       * origin —— 光线投射的原点向量。
+       * direction —— 向射线提供方向的方向向量，应当被标准化。
+       * near —— 返回的所有结果比near远。near不能为负值，其默认值为0。
+       * far —— 返回的所有结果都比far近。far不能小于near，其默认值为Infinity（正无穷。）
+       */
+      const mouse = new THREE.Vector2(),
+        reycaster = new THREE.Raycaster();
+
+      init();
+
+      function init() {
+        container = document.createElement("div");
+        document.body.appendChild(container);
+
+        camera = new THREE.PerspectiveCamera(
+          70,
+          window.innerWidth / window.innerHeight,
+          1,
+          5000
+        );
+        camera.position.z = 1000;
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+
+        /**
+         * AmbientLight( color : Integer, intensity : Float )
+         * 环境光会均匀的照亮场景中的所有物体。
+         * color - (参数可选）颜色的rgb数值。缺省值为 0xffffff。
+         * intensity - (参数可选)光照的强度。缺省值为 1。
+         */
+        scene.add(new THREE.AmbientLight(0x505050));
+
+        const light = new THREE.SpotLight(0xffffff, 1.5);
+        light.position.set(0, 500, 2000);
+        light.angle = Math.PI / 9; // 这里设置的 灯光角度 会影响阴影的 模糊程度(视觉感觉)
+
+        light.castShadow = true; // 设为true 聚光灯将投射阴影
+        light.shadow.camera.near = 1000;
+        light.shadow.camera.far = 4000;
+        light.shadow.mapSize.width = 1024; // 这里影响 落影 展示的区域
+        light.shadow.mapSize.height = 1024; // 这里影响 落影 展示的区域
+
+        scene.add(light);
+        /**
+         * 组（Group）
+         * 它几乎和Object3D是相同的，其目的是使得组中对象在语法上的结构更加清晰
+         */
+        group = new THREE.Group();
+        scene.add(group);
+        // 立方缓冲几何体
+        const geometry = new THREE.BoxBufferGeometry(40, 40, 40);
+
+        // 创建 200 个 几何体
+        for (let i = 0; i < 200; i++) {
+          // 创建一个包含 立方几何体，并给一个随机的颜色
+          const object = new THREE.Mesh(
+            geometry,
+            new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff })
+          );
+
+          // 给网格 设置一个相对(500，300,400)的位置
+          object.position.x = Math.random() * 1000 - 500;
+          object.position.y = Math.random() * 600 - 300;
+          object.position.z = Math.random() * 800 - 400;
+
+          object.rotation.x = Math.random() * 2 * Math.PI;
+          object.rotation.y = Math.random() * 2 * Math.PI;
+          object.rotation.z = Math.random() * 2 * Math.PI;
+
+          object.scale.x = Math.random() * 2 + 1;
+          object.scale.y = Math.random() * 2 + 1;
+          object.scale.z = Math.random() * 2 + 1;
+
+          object.castShadow = true; //  castShadow 为true 时，会产生阴影
+          object.receiveShadow = true;
+
+          // 将 当前 几何体 插入到 场景中
+          scene.add(object);
+
+          // 将 集合里面 加入当前几何体
+          objects.push(object);
+        }
+
+        // antialias 是否执行拉锯齿
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        renderer.shadowMap.enabled = true;
+        /**
+         * 阴影类型
+         * PCFShadowMap 为默认值，使用Percentage-Closer Filtering (PCF)算法来过滤阴影映射
+         */
+        renderer.shadowMap.type = THREE.PCFShadowMap;
+
+        container.appendChild(renderer.domElement);
+        /**
+         * 拖放控制器（DragControls）
+         * 该类被用于提供一个拖放交互。
+         * DragControls( objects : Array, camera : Camera, domElement : HTMLDOMElement )
+         * objects: 一组可被拖拽的3D Objects。
+         * camera: 渲染场景的摄像机。
+         * domElement: 用于事件监听的HTML元素。
+         * 创建一个新的 DragControls 实例。
+         */
+        controls = new DragControls([...objects], camera, renderer.domElement);
+        controls.addEventListener("drag", render);
+
+        window.addEventListener("resize", onWindowResize, false);
+
+        document.addEventListener("click", onClick, false);
+        window.addEventListener("keydown", onKeyDown, false);
+        window.addEventListener("keyup", onKeyUp, false);
+
+        render();
+      }
+
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        render();
+      }
+
+      function onKeyDown(event) {
+        enableSelection = event.keyCode === 16 ? true : false;
+      }
+
+      function onKeyUp() {
+        enableSelection = false;
+      }
+
+      function onClick(event) {
+        event.preventDefault();
+
+        if (enableSelection === true) {
+          /**
+           * intersectObject ( object : Object3D, recursive : Boolean, optionalTarget : Array ) : Array
+           * object —— 检查与射线相交的物体。
+           * recursive —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为false。
+           * optionalTarget — （可选）设置结果的目标数组。如果不设置这个值，则一个新的Array会被实例化；
+           * 如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）
+           */
+          const draggableObjects = controls.getObjects();
+          draggableObjects.length = 0;
+
+          /**
+           * .setFromCamera ( coords : Vector2, camera : Camera ) : null
+           * coords —— 在标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间。
+           * camera —— 射线所来源的摄像机。
+           * 使用一个新的原点和方向来更新射线。
+           */
+          mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+          raycaster.setFromCamera(mouse, camera);
+
+          const intersections = raycaster.intersectObjects(objects, true);
+
+          if (intersections.length > 0) {
+            const object = intersections[0].object;
+
+            if (group.children.includes(object) === true) {
+              object.material.emissive.set(0x000000);
+              scene.attach(object);
+            } else {
+              object.material.emissive.set(0xaaaaaa);
+              group.attach(object);
+            }
+
+            controls.transformGroup = true;
+            draggableObjects.push(group);
+          }
+
+          if (group.children.length === 0) {
+            controls.transformGroup = false;
+            draggableObjects.push(...objects);
+          }
+        }
+
+        render();
+      }
+
+      function render() {
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>

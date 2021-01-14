@@ -2,7 +2,7 @@
  * @Author: your name
  * @LastEditors: xiasong
  * @Date: 2021-01-13 18:03:37
- * @LastEditTime: 2021-01-13 18:05:36
+ * @LastEditTime: 2021-01-14 18:02:16
  * @Description: description
  * @FilePath: \THREEDEMO\src\special_zone\index.html
 -->
@@ -11,22 +11,233 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Hello World</title>
-    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <!-- <title>demo</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/react/16.14.0/umd/react.development.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.14.0/umd/react-dom.development.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.15.0/babel.min.js"></script> -->
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.0/axios.min.js"></script> -->
+    <script src="./react.development.min.js"></script>
+    <script src="./react-dom.development.min.js"></script>
+    <script src="./babel.min.js"></script>
+    <style>
+      html,
+      body,
+      div,
+      p,
+      a,
+      span,
+      ul,
+      ol,
+      li,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin: 0;
+        padding: 0;
+      }
+
+      ul,
+      ol,
+      li {
+        list-style: none;
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
     <script type="text/babel">
       class MessageBox extends React.Component {
-        onClick = () => {
-          alert("clicked");
-        };
         render = () => {
           return (
-            <div>
-              <h1 onClick={this.onClick}>Hello World!</h1>
+            <div
+              style={{
+                backgroundColor: "#7D171D",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <div style={{ width: "100%" }}>
+                <img
+                  src="../image/special_zone/bg_top.jpg"
+                  style={{ width: "100%", display: "block" }}
+                />
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  padding: "0 158px",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ width: "100%" }}>
+                  <div style={{ position: "relative" }}>
+                    <img
+                      src="../image/special_zone/bd_title.jpg"
+                      style={{ display: "block", width: "100%" }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translateX(-50%) translateY(-50%)",
+                        color: "#fff",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: 50,
+                          paddingTop: "25%",
+                          textAlign: "center",
+                        }}
+                      >
+                        管理升级类
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 30,
+                          textAlign: "center",
+                          marginTop: 10,
+                        }}
+                      >
+                        降本增效
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <img
+                      src="../image/special_zone/bd_top2.jpg"
+                      style={{ display: "block", width: "100%" }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      position: "relative",
+                      backgroundImage: `url(${"../image/special_zone/bd_center3.jpg"})`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                      backgroundSize: "cover",
+                      height: "fit-content",
+                    }}
+                  >
+                    <div
+                      style={{
+                        // position: "absolute",
+                        // top: 0,
+                        // left: "20%",
+                        // width: "60%",
+                        margin: "0 auto",
+                        marginTop: "-5%",
+                      }}
+                    >
+                      <p style={{ color: "#996666", fontSize: 30 }}>
+                        云主机、数据库、安全等基础产品助力企业轻松上云。
+                      </p>
+                      <div>
+                        <ul>
+                          <li>
+                            <p style={{ display: "flex", paddingTop: 60 }}>
+                              <span
+                                style={{
+                                  display: "block",
+                                  padding: "5px 15px",
+                                  backgroundColor: "#C52518",
+                                  color: "#fff",
+                                  borderRadius: 5,
+                                  fontSize: 40,
+                                }}
+                              >
+                                附近推
+                              </span>
+                            </p>
+                            <p
+                              style={{
+                                color: "#996666",
+                                fontSize: 30,
+                                padding: "40px 0 30px",
+                              }}
+                            >
+                              将门店优惠卡卷快速推给周边用户，以朋友圈广告卡片的形式呈现
+                              ，用户点击卡片即可快速领取，迅速让周边用户了解门店信息及最新活动。
+                            </p>
+                            <ul>
+                              <li>
+                                <p style={{ color: "#3782C2", fontSize: 40 }}>
+                                  补贴政策:
+                                </p>
+                                <ul style={{ fontSize: 35, color: "#6A0300" }}>
+                                  <li style={{ paddingTop: 20 }}>
+                                    1、赠送10%人数扩容；
+                                  </li>
+                                  <li style={{ paddingTop: 20 }}>
+                                    2、对应版本的数据驾驶舱免费使 用半年
+                                  </li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <p style={{ display: "flex", paddingTop: 60 }}>
+                              <span
+                                style={{
+                                  display: "block",
+                                  padding: "5px 15px",
+                                  backgroundColor: "#C52518",
+                                  color: "#fff",
+                                  borderRadius: 5,
+                                  fontSize: 40,
+                                }}
+                              >
+                                附近推
+                              </span>
+                            </p>
+                            <p
+                              style={{
+                                color: "#996666",
+                                fontSize: 30,
+                                padding: "40px 0 30px",
+                              }}
+                            >
+                              将门店优惠卡卷快速推给周边用户，以朋友圈广告卡片的形式呈现
+                              ，用户点击卡片即可快速领取，迅速让周边用户了解门店信息及最新活动。
+                            </p>
+                            <ul>
+                              <li>
+                                <p style={{ color: "#3782C2", fontSize: 40 }}>
+                                  补贴政策:
+                                </p>
+                                <ul style={{ fontSize: 35, color: "#6A0300" }}>
+                                  <li style={{ paddingTop: 20 }}>
+                                    1、赠送10%人数扩容；
+                                  </li>
+                                  <li style={{ paddingTop: 20 }}>
+                                    2、对应版本的数据驾驶舱免费使 用半年
+                                  </li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ marginTop: "-2px", marginLeft: "-3px" }}>
+                    <img
+                      src="../image/special_zone/bd_bottom3.jpg"
+                      style={{ width: "100%", display: "block" }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           );
         };
@@ -35,3 +246,88 @@
     </script>
   </body>
 </html>
+
+<!-- 
+
+
+
+  <div style={{ position: "relative" }}>
+                    <img
+                      src="../image/special_zone/bd_top.jpg"
+                      style={{ width: "100%", display: "block" }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 135,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        color: "#fff",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: 55,
+                          fontWeight: "bold",
+                          textAlign: "center",
+                        }}
+                      >
+                        企业上云类
+                      </p>
+                      <p style={{ fontSize: 25, textAlign: "center" }}>
+                        按需付费，轻资产上阵
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      position: "relative",
+                      marginTop: "-2px",
+                      marginLeft: "-1px",
+                    }}
+                  >
+                    <img
+                      src="../image/special_zone/bd_center2.jpg"
+                      style={{ width: "100%", display: "block" }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 190,
+                        width: "65%",
+                      }}
+                    >
+                      <p style={{ color: "#996666", fontSize: 30 }}>
+                        云主机、数据库、安全等基础产品助力企业轻松上云。
+                      </p>
+                      <div>
+                        <div>
+                          <div>
+                            <div
+                              style={{
+                                backgroundColor: "#C52518",
+                                color: "#fff",
+                                padding: "0 5px",
+                              }}
+                            >
+                              AI党建云标准版
+                            </div>
+                          </div>
+                          <p>
+                            专为党组织打造的集“宣传、管理、教育、服务、沟通、考核”于一体的智慧党建云平台，可以支持随时随地开展党建工作，提升党建信息化智能化水平。{" "}
+                          </p>
+                          <div>
+                            <div>
+                              <p>补贴政策：</p>
+                              <ul>
+                                <li>1、赠送10%人数扩容；</li>
+                                <li>2、对应版本的数据驾驶舱免费使 用半年！</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+ -->

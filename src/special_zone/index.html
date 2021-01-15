@@ -2,7 +2,7 @@
  * @Author: your name
  * @LastEditors: xiasong
  * @Date: 2021-01-13 18:03:37
- * @LastEditTime: 2021-01-14 18:02:16
+ * @LastEditTime: 2021-01-15 16:45:14
  * @Description: description
  * @FilePath: \THREEDEMO\src\special_zone\index.html
 -->
@@ -15,8 +15,8 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/react/16.14.0/umd/react.development.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.14.0/umd/react-dom.development.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.15.0/babel.min.js"></script> -->
-    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.0/axios.min.js"></script> -->
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <script src="./axios.min.js"></script>
     <script src="./react.development.min.js"></script>
     <script src="./react-dom.development.min.js"></script>
     <script src="./babel.min.js"></script>
@@ -50,284 +50,426 @@
   <body>
     <div id="app"></div>
     <script type="text/babel">
-      class MessageBox extends React.Component {
-        render = () => {
-          return (
-            <div
-              style={{
-                backgroundColor: "#7D171D",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <div style={{ width: "100%" }}>
+      const { useEffect, useState, useContext, createContext } = React;
+
+      // 单个 渲染模板
+      const UnitEle = (props) => {
+        const { isPc, unitData } = props;
+        if (!unitData) return null;
+        const { title, subTitle, des, unitList } = unitData;
+        // console.log(unitList);
+        const eleHeight = {
+          des: 70, // 第一层描述
+          title: 63, // 第二层 title
+          des_sec: 190, // 第二次 des
+          title_three: 53, // 第三层title
+          des_three: 66, // 第四层描述
+        };
+
+        const changeHeight = () => {
+          let curHeight = 0;
+          if (des) curHeight += 70;
+          if (unitList && Array.isArray(unitList)) {
+            unitList.forEach((item) => {
+              if (item.title) curHeight += 63;
+              if (item.des) curHeight += 190;
+              if (item.unitAtom && Array.isArray(item.unitAtom)) {
+                item.unitAtom.forEach((cItem) => {
+                  if (cItem.title) curHeight += 53;
+                  if (cItem.moreInfo && Array.isArray(cItem.moreInfo)) {
+                    cItem.moreInfo.forEach((caItem) => {
+                      if (caItem) curHeight += 66;
+                    });
+                  }
+                });
+              }
+            });
+          }
+          return curHeight;
+        };
+        console.log(changeHeight());
+        let countHeight = changeHeight();
+
+        // 选择 展示 三段模块 以及中间超过的时候 具体划分
+        const selectPart = (type) => {
+          const first = () => {
+            return (
+              <div
+                style={{ width: "100%", position: "absolute", top: 0, left: 4 }}
+              >
                 <img
-                  src="../image/special_zone/bg_top.jpg"
-                  style={{ width: "100%", display: "block" }}
+                  src="../image/special_zone/bd_first.png"
+                  style={{ width: "100%" }}
                 />
               </div>
+            );
+          };
+
+          const second = () => {
+            const secDemo = (per) => {
+              console.log(per);
+              return (
+                <div
+                  style={{
+                    width: "100%",
+                    position: "absolute",
+                    top: per ? per : "50%",
+                    left: 4,
+                  }}
+                >
+                  <img
+                    src="../image/special_zone/bd_second.png"
+                    style={{ width: "100%" }}
+                  />
+                </div>
+              );
+            };
+
+            let initalPer = [20];
+
+            if (countHeight > 1200 || countHeight < 1700) {
+              initalPer.push(40);
+            }
+
+            return initalPer.map((item) => secDemo(`${item}%`));
+          };
+
+          const three = () => {
+            return (
               <div
                 style={{
                   width: "100%",
-                  height: "auto",
-                  padding: "0 158px",
-                  boxSizing: "border-box",
+                  position: "absolute",
+                  bottom: 0,
+                  left: 4,
+                }}
+              >
+                <img
+                  src="../image/special_zone/bd_three.png"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            );
+          };
+
+          if (!type) return null;
+          if (type === "first") {
+            return first();
+          } else if (type === "three") {
+            if (countHeight > 700) {
+              return three();
+            }
+          } else if (type === "second") {
+            return second();
+          }
+        };
+
+        return (
+          <div style={{ width: "100%" }}>
+            <div style={{ position: "relative" }}>
+              <img
+                src="../image/special_zone/bd_title2.jpg"
+                style={{ display: "block", width: "100%" }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translateX(-50%) translateY(-50%)",
+                  color: "#fff",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: isPc ? 50 : 40,
+                    textAlign: "center",
+                    marginTop: isPc ? 0 : "-6px",
+                  }}
+                >
+                  {title ? title : ""}
+                </p>
+                <p
+                  style={{
+                    fontSize: isPc ? 30 : 25,
+                    textAlign: "center",
+                    marginTop: isPc ? 10 : 0,
+                  }}
+                >
+                  {subTitle ? subTitle : ""}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <img
+                src="../image/special_zone/bd_top2.jpg"
+                style={{ display: "block", width: "100%" }}
+              />
+            </div>
+
+            <div
+              style={{
+                position: "relative",
+                backgroundImage: `url(${"../image/special_zone/10_2.jpg"})`,
+                backgroundPosition: "center",
+                backgroundRepeat: "repeat",
+                backgroundSize: "contain",
+                width: "100%",
+                height: "fit-content",
+                marginLeft: isPc ? "-3px" : "-2px",
+              }}
+            >
+              {selectPart("first")}
+              {selectPart("second")}
+              {selectPart("three")}
+              <div
+                style={{
+                  width: "60%",
+                  margin: "0 auto",
+                  marginTop: "-5%",
+                }}
+              >
+                {des ? (
+                  <p
+                    style={{
+                      color: "#996666",
+                      fontSize: 30,
+                      paddingBottom: 30,
+                    }}
+                  >
+                    {des}
+                  </p>
+                ) : (
+                  ""
+                )}
+                <div>
+                  <ul>
+                    {Array.from(
+                      unitList && Array.isArray(unitList) ? unitList : [],
+                      (item, index) => {
+                        return (
+                          <li key={index}>
+                            {item.title && (
+                              <p style={{ display: "flex", paddingTop: 60 }}>
+                                <span
+                                  style={{
+                                    display: "block",
+                                    padding: "5px 15px",
+                                    backgroundColor: "#C52518",
+                                    color: "#fff",
+                                    borderRadius: 5,
+                                    fontSize: 40,
+                                  }}
+                                >
+                                  {item.title}
+                                </span>
+                              </p>
+                            )}
+                            {item.des && (
+                              <p
+                                style={{
+                                  color: "#996666",
+                                  fontSize: 30,
+                                  padding: "40px 0 30px",
+                                }}
+                              >
+                                {item.des}
+                              </p>
+                            )}
+
+                            <ul>
+                              {Array.from(
+                                item.unitAtom && Array.isArray(item.unitAtom)
+                                  ? item.unitAtom
+                                  : [],
+                                (cItem, cIndex) => {
+                                  return (
+                                    <li key={cIndex}>
+                                      {cItem.title && (
+                                        <p
+                                          style={{
+                                            color: "#3782C2",
+                                            fontSize: 40,
+                                          }}
+                                        >
+                                          {cItem.title}:
+                                        </p>
+                                      )}
+
+                                      <ul
+                                        style={{
+                                          fontSize: 35,
+                                          color: "#6A0300",
+                                        }}
+                                      >
+                                        {Array.from(
+                                          cItem.moreInfo &&
+                                            Array.isArray(cItem.moreInfo)
+                                            ? cItem.moreInfo
+                                            : [],
+                                          (acItem, acIndex) => {
+                                            return acItem ? (
+                                              <li
+                                                style={{ paddingTop: 20 }}
+                                                key={acIndex}
+                                              >
+                                                {acItem}
+                                              </li>
+                                            ) : null;
+                                          }
+                                        )}
+                                      </ul>
+                                    </li>
+                                  );
+                                }
+                              )}
+                            </ul>
+                          </li>
+                        );
+                      }
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "-2px", marginLeft: "-2px" }}>
+              <img
+                src="../image/special_zone/bd_bottom4.jpg"
+                style={{ width: "100%", display: "block" }}
+              />
+            </div>
+          </div>
+        );
+      };
+
+      const Demo = () => {
+        const [isPc, setIsPc] = useState(true);
+        const [backData, setBackData] = useState({});
+
+        useEffect(() => {
+          onWindowResize();
+          fetchCurrentData();
+          window.addEventListener("resize", onWindowResize);
+        }, []);
+
+        // 请求 当前页的数据
+        const fetchCurrentData = () => {
+          axios
+            .get("./data.json")
+            .then((res) => {
+              // console.log(res.data);
+              setBackData(res.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        };
+
+        // 监听 窗口变化
+        const onWindowResize = () => {
+          let Width =
+            window.innerWidth ||
+            document.documentElement.clientWidth ||
+            document.body.clientWidth;
+          if (Width > 1400) {
+            setIsPc(true);
+          } else {
+            setIsPc(false);
+          }
+        };
+
+        const { des, date, productList } = backData;
+        return (
+          <div
+            style={{
+              backgroundColor: "#7D171D",
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <div style={{ width: "100%" }}>
+              <img
+                src="../image/special_zone/bg_top.jpg"
+                style={{ width: "100%", display: "block" }}
+              />
+            </div>
+            <div
+              style={{
+                width: "100%",
+                height: "auto",
+                padding: "0 158px",
+                boxSizing: "border-box",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  color: "#FFB100",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <div style={{ width: "100%" }}>
-                  <div style={{ position: "relative" }}>
-                    <img
-                      src="../image/special_zone/bd_title.jpg"
-                      style={{ display: "block", width: "100%" }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translateX(-50%) translateY(-50%)",
-                        color: "#fff",
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: 50,
-                          paddingTop: "25%",
-                          textAlign: "center",
-                        }}
-                      >
-                        管理升级类
-                      </p>
-                      <p
-                        style={{
-                          fontSize: 30,
-                          textAlign: "center",
-                          marginTop: 10,
-                        }}
-                      >
-                        降本增效
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <img
-                      src="../image/special_zone/bd_top2.jpg"
-                      style={{ display: "block", width: "100%" }}
-                    />
-                  </div>
+                {des && (
                   <div
                     style={{
-                      position: "relative",
-                      backgroundImage: `url(${"../image/special_zone/bd_center3.jpg"})`,
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "center",
-                      backgroundSize: "cover",
-                      height: "fit-content",
+                      fontSize: 35,
+                      textIndent: "3rem",
+                      textAlign: "justify",
                     }}
                   >
-                    <div
-                      style={{
-                        // position: "absolute",
-                        // top: 0,
-                        // left: "20%",
-                        // width: "60%",
-                        margin: "0 auto",
-                        marginTop: "-5%",
-                      }}
-                    >
-                      <p style={{ color: "#996666", fontSize: 30 }}>
-                        云主机、数据库、安全等基础产品助力企业轻松上云。
-                      </p>
-                      <div>
-                        <ul>
-                          <li>
-                            <p style={{ display: "flex", paddingTop: 60 }}>
-                              <span
-                                style={{
-                                  display: "block",
-                                  padding: "5px 15px",
-                                  backgroundColor: "#C52518",
-                                  color: "#fff",
-                                  borderRadius: 5,
-                                  fontSize: 40,
-                                }}
-                              >
-                                附近推
-                              </span>
-                            </p>
-                            <p
-                              style={{
-                                color: "#996666",
-                                fontSize: 30,
-                                padding: "40px 0 30px",
-                              }}
-                            >
-                              将门店优惠卡卷快速推给周边用户，以朋友圈广告卡片的形式呈现
-                              ，用户点击卡片即可快速领取，迅速让周边用户了解门店信息及最新活动。
-                            </p>
-                            <ul>
-                              <li>
-                                <p style={{ color: "#3782C2", fontSize: 40 }}>
-                                  补贴政策:
-                                </p>
-                                <ul style={{ fontSize: 35, color: "#6A0300" }}>
-                                  <li style={{ paddingTop: 20 }}>
-                                    1、赠送10%人数扩容；
-                                  </li>
-                                  <li style={{ paddingTop: 20 }}>
-                                    2、对应版本的数据驾驶舱免费使 用半年
-                                  </li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </li>
-                          <li>
-                            <p style={{ display: "flex", paddingTop: 60 }}>
-                              <span
-                                style={{
-                                  display: "block",
-                                  padding: "5px 15px",
-                                  backgroundColor: "#C52518",
-                                  color: "#fff",
-                                  borderRadius: 5,
-                                  fontSize: 40,
-                                }}
-                              >
-                                附近推
-                              </span>
-                            </p>
-                            <p
-                              style={{
-                                color: "#996666",
-                                fontSize: 30,
-                                padding: "40px 0 30px",
-                              }}
-                            >
-                              将门店优惠卡卷快速推给周边用户，以朋友圈广告卡片的形式呈现
-                              ，用户点击卡片即可快速领取，迅速让周边用户了解门店信息及最新活动。
-                            </p>
-                            <ul>
-                              <li>
-                                <p style={{ color: "#3782C2", fontSize: 40 }}>
-                                  补贴政策:
-                                </p>
-                                <ul style={{ fontSize: 35, color: "#6A0300" }}>
-                                  <li style={{ paddingTop: 20 }}>
-                                    1、赠送10%人数扩容；
-                                  </li>
-                                  <li style={{ paddingTop: 20 }}>
-                                    2、对应版本的数据驾驶舱免费使 用半年
-                                  </li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
+                    {des}
                   </div>
-                  <div style={{ marginTop: "-2px", marginLeft: "-3px" }}>
-                    <img
-                      src="../image/special_zone/bd_bottom3.jpg"
-                      style={{ width: "100%", display: "block" }}
-                    />
+                )}
+                {date && (
+                  <div style={{ fontSize: 30, paddingTop: 60 }}>
+                    <span>活动时间：</span> {date}
                   </div>
-                </div>
+                )}
+              </div>
+              {Array.from(
+                productList && Array.isArray(productList) ? productList : [],
+                (item, index) => {
+                  return <UnitEle isPc={isPc} unitData={item} key={index} />;
+                }
+              )}
+            </div>
+            <div
+              style={{
+                width: "100%",
+                height: "fit-content",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                padding: "100px 0",
+              }}
+            >
+              <img src="../image/special_zone/code.jpg" />
+              <div
+                style={{
+                  color: "#c79b9e",
+                  textAlign: "center",
+                  fontSize: isPc ? "inherit" : 30,
+                }}
+              >
+                <p style={{ margin: "10px auto" }}>
+                  如有所需,扫码后联通经理与您联系!
+                </p>
+                <p>更多产品详询当地联通</p>
               </div>
             </div>
-          );
-        };
-      }
-      ReactDOM.render(<MessageBox />, document.getElementById("app"));
+          </div>
+        );
+      };
+
+      ReactDOM.render(<Demo />, document.getElementById("app"));
     </script>
   </body>
 </html>
-
-<!-- 
-
-
-
-  <div style={{ position: "relative" }}>
-                    <img
-                      src="../image/special_zone/bd_top.jpg"
-                      style={{ width: "100%", display: "block" }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 135,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        color: "#fff",
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: 55,
-                          fontWeight: "bold",
-                          textAlign: "center",
-                        }}
-                      >
-                        企业上云类
-                      </p>
-                      <p style={{ fontSize: 25, textAlign: "center" }}>
-                        按需付费，轻资产上阵
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      position: "relative",
-                      marginTop: "-2px",
-                      marginLeft: "-1px",
-                    }}
-                  >
-                    <img
-                      src="../image/special_zone/bd_center2.jpg"
-                      style={{ width: "100%", display: "block" }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 190,
-                        width: "65%",
-                      }}
-                    >
-                      <p style={{ color: "#996666", fontSize: 30 }}>
-                        云主机、数据库、安全等基础产品助力企业轻松上云。
-                      </p>
-                      <div>
-                        <div>
-                          <div>
-                            <div
-                              style={{
-                                backgroundColor: "#C52518",
-                                color: "#fff",
-                                padding: "0 5px",
-                              }}
-                            >
-                              AI党建云标准版
-                            </div>
-                          </div>
-                          <p>
-                            专为党组织打造的集“宣传、管理、教育、服务、沟通、考核”于一体的智慧党建云平台，可以支持随时随地开展党建工作，提升党建信息化智能化水平。{" "}
-                          </p>
-                          <div>
-                            <div>
-                              <p>补贴政策：</p>
-                              <ul>
-                                <li>1、赠送10%人数扩容；</li>
-                                <li>2、对应版本的数据驾驶舱免费使 用半年！</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
- -->

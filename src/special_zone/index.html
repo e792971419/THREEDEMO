@@ -2,7 +2,7 @@
  * @Author: your name
  * @LastEditors: xiasong
  * @Date: 2021-01-13 18:03:37
- * @LastEditTime: 2021-01-15 16:45:14
+ * @LastEditTime: 2021-01-15 18:18:31
  * @Description: description
  * @FilePath: \THREEDEMO\src\special_zone\index.html
 -->
@@ -88,7 +88,7 @@
           return curHeight;
         };
         console.log(changeHeight());
-        let countHeight = changeHeight();
+        const countHeight = changeHeight();
 
         // 选择 展示 三段模块 以及中间超过的时候 具体划分
         const selectPart = (type) => {
@@ -125,10 +125,10 @@
               );
             };
 
-            let initalPer = [20];
+            let initalPer = [30];
 
-            if (countHeight > 1200 || countHeight < 1700) {
-              initalPer.push(40);
+            if (countHeight > 2300) {
+              initalPer.push(60);
             }
 
             return initalPer.map((item) => secDemo(`${item}%`));
@@ -140,7 +140,7 @@
                 style={{
                   width: "100%",
                   position: "absolute",
-                  bottom: 0,
+                  bottom: isPc ? -120 : 0,
                   left: 4,
                 }}
               >
@@ -160,7 +160,9 @@
               return three();
             }
           } else if (type === "second") {
-            return second();
+            if (countHeight > 1700) {
+              return second();
+            }
           }
         };
 

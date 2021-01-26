@@ -1,0 +1,78 @@
+<!--
+ * @Author: your name
+ * @LastEditors: xiasong
+ * @Date: 2021-01-12 15:15:08
+ * @LastEditTime: 2021-01-12 17:17:10
+ * @Description: description
+ * @FilePath: \THREEDEMO\src\03firstPersonControls.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>03firstPersonControls</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden; /* 隐藏body 窗口区域的滚动条 */
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // 通过访问 https://unpkg.com/three 来查找最新版本。
+      // 该URL将会重定向到最新的稳定版本。
+      import * as THREE from "../node_modules/three/build/three.module.js";
+
+      //
+      import Stats from "../node_modules/three/examples/jsm/libs/stats.module.js";
+      // 引入 第一人称
+      import { FirstPersonControls } from "../node_modules/three/examples/jsm/controls/FirstPersonControls.js";
+
+      import { ImprovedNoise } from "../node_modules/three/examples/jsm/math/ImprovedNoise.js";
+
+      let container, stats;
+      let camera, controls, scene, renderer;
+
+      let mesh, texture;
+
+      const worldWidth = 256,
+        worldDepth = 256,
+        worldHalfWidth = worldWidth / 2,
+        worldHalfDepth = worldDepth / 2;
+
+      const clock = new THREE.Clock();
+
+      init();
+      animate();
+
+      function init() {
+        container = document.getElementById("container");
+        camera = new THREE.PerspectiveCamera(
+          60,
+          window.innerWidth / window.innerHeight,
+          1,
+          20000
+        );
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xbfd1e5);
+
+        const data = generateHeight(worldWidth, worldDepth);
+
+        camera.position.y =
+          data[worldHalfWidth + worldHalfDepth * worldWidth] * 10 + 500;
+
+        const geometry = new THREE.PlaneBufferGeometry(
+          7500,
+          7500,
+          worldWidth - 1,
+          worldDepth - 1
+        );
+        geometry.rotateX(-Math.PI / 2);
+
+        const vertices = geometry.attributes.position.array;
+      }
+    </script>
+  </body>
+</html>

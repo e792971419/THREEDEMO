@@ -2,7 +2,7 @@
  * @Author: your name
  * @LastEditors: xiasong
  * @Date: 2021-01-26 16:01:07
- * @LastEditTime: 2021-01-26 16:03:44
+ * @LastEditTime: 2021-01-28 12:24:05
  * @Description: description
  * @FilePath: \THREEDEMO\src\special_zone\test2.js
  */
@@ -16,7 +16,7 @@
     }
 
     // 私有变量
-    #mockData = {
+    mockData = {
       des:
         "2021年各行各业数字化转型全面提速，河南联通发挥央企优势，践行央企担当，携手阿里、腾讯、新华三等龙头企业，推出2021数字河南D计划——“千万补贴，助推河南数字化转型”公有云专项促销活动，免费试用、优惠打折、订购赠送，降本增效，助力企业腾飞！",
       date: "2021年1月1日-4月30日",
@@ -290,10 +290,12 @@
     }
 
     // 监听 窗口变化
-    onWindowResize() {
+    onWindowResize = () => {
+      // this.setFontSize();
+      // window.addEventListener("resize", this.setFontSize);
       window.addEventListener("resize", this.handleResize);
       window.addEventListener("resize", this.domRender);
-    }
+    };
 
     // 根究可视窗口的宽度大小来判断 isPc 的布尔值
     handleResize() {
@@ -305,8 +307,15 @@
       this.isPc = Width > 1400 ? true : false;
     }
 
+    setFontSize = () => {
+      console.log(document.body.clientWidth);
+      document.documentElement.style.fontSize =
+        ((document.body.clientWidth / 750) * 100) / 2 + "px";
+      console.log(document.documentElement.style.fontSize);
+    };
+
     temRender() {
-      const { des, date, productList = [] } = this.#mockData;
+      const { des, date, productList = [] } = this.mockData;
 
       return `
           <div style="width: 100%; height: 100%; background-color: #7D171D">
@@ -315,27 +324,39 @@
                 src="https://gec.10010.com/multi/unified-storage/image/202101/21012511ca482e517181.jpg"
                 style="width: 100%; display: block" />
             </div>
-            <div style="width: 100%; height: auto; padding: 0 158px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center" >
+            <div style="width: 100%; height: auto; padding: 0 ${
+              this.isPc ? "158px" : "3vh"
+            }; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center" >
               <div style="color: #FFB100; display: flex; flex-direction: column; justify-content: center; align-items: center" >
                 ${
                   des
-                    ? `<div style="font-size: 35px; text-indent: 3rem; text-align: justify" > ${des} </div>`
+                    ? `<div style="font-size: ${
+                        this.isPc ? "35px" : "3vh"
+                      }; text-indent: 3rem; text-align: justify" > ${des} </div>`
                     : ""
                 }
                 ${
                   date
-                    ? `<div style="font-size: 30px; padding-top: 60px" > <span>活动时间：</span>${date} </div>`
+                    ? `<div style="font-size: ${
+                        this.isPc ? "30px" : "2.5vh"
+                      }; padding-top: ${
+                        this.isPc ? "60px" : "4vh"
+                      }" > <span>活动时间：</span>${date} </div>`
                     : ""
                 }
               </div>
               ${this.domArrayRender(productList)}
             </div>
-            <div style="width: 100%; height: fit-content; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 100px 0" >
+            <div style="width: 100%; height: fit-content; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: ${
+              this.isPc ? "100px" : "4vh"
+            } 0" >
               <img src="https://gec.10010.com/multi/unified-storage/image/202101/21012511d257dd276110.jpg" style="display: block" />
               <div style="color: #c79b9e; text-align: center; font-size: ${
-                this.isPc ? "inherit" : "30px"
+                this.isPc ? "inherit" : "2.5vh"
               }">
-              <p style="margin: 10px auto" >如有所需，扫码后联通经理与您联系</p>
+              <p style="margin: ${
+                this.isPc ? "10px" : "2vh"
+              } auto" >如有所需，扫码后联通经理与您联系</p>
               <p>更多产品详询当地联通</p>
               </div>
             </div>
@@ -349,6 +370,7 @@
     }
 
     unitEleRender(unitData) {
+      const _this = this;
       const { title, subTitle, des, unitList } = unitData;
       let curIsPc = this.isPc;
       let countHeight = changeHeight();
@@ -379,7 +401,9 @@
       // 选择每个模块(图片的)
       function selectPart(type) {
         const first = () => {
-          return `<div style="width: 100%; position: absolute; top: 0; left: 4px" >
+          return `<div style="width: 100%; position: absolute; top: 0; left: ${
+            _this.isPc ? "4px" : "1px"
+          }" >
               <img src="https://gec.10010.com/multi/unified-storage/image/202101/2101251136e2ab974410.png" style="width: 100%" />
             </div>`;
         };
@@ -388,7 +412,9 @@
           const secDemo = (per) => {
             return `<div style="width: 100%; position: absolute; top: ${
               per ? per : "50%"
-            };left: 4px" > <img src="https://gec.10010.com/multi/unified-storage/image/202101/21012511ac9b2a662919.png" style="width: 100%" /> </div>`;
+            };left: ${
+              _this.isPc ? "4px" : "1px"
+            }" > <img src="https://gec.10010.com/multi/unified-storage/image/202101/21012511ac9b2a662919.png" style="width: 100%" /> </div>`;
           };
 
           let initialPer = [30];
@@ -399,7 +425,7 @@
         const three = () => {
           return `<div style="width: 100%; position: absolute; bottom: ${
             curIsPc ? "-120px" : 0
-          }; left: 4px;"
+          }; left: ${_this.isPc ? "4px" : "1px"};"
           >
           <img  src="https://gec.10010.com/multi/unified-storage/image/202101/21012511c78de2717856.png" style="width: 100%" />
           </div>`;
@@ -427,7 +453,7 @@
               <div style="position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); color: #fff" >
                 ${
                   title
-                    ? `<p style="font-size: ${this.isPc ? "50px" : "40px"};
+                    ? `<p style="font-size: ${this.isPc ? "50px" : "3vh"};
                                  text-align: center; margin-top: ${
                                    this.isPc ? 0 : "-6px"
                                  }"
@@ -436,7 +462,7 @@
                 }
                 ${
                   subTitle
-                    ? `<p style="font-size: ${this.isPc ? "30px" : "25px"};
+                    ? `<p style="font-size: ${this.isPc ? "30px" : "2vh"};
                                  text-align: center; margin-top: ${
                                    this.isPc ? "10px" : 0
                                  }" >${subTitle}</p>`
@@ -449,7 +475,7 @@
             </div>
             <div
               style="position: relative; background-image: url(${"https://gec.10010.com/multi/unified-storage/image/202101/210125118d5cc9189342.jpg"}); background-position: center; background-repeat: repeat; background-size: contain; width: 100%; height: fit-content; margin-left: ${
-        curIsPc ? "-3px" : "-3px"
+        curIsPc ? "-3px" : "-1px"
       }
                      "
             >
@@ -459,7 +485,11 @@
               <div style="width: 60%; margin: 0 auto; margin-top: -5%; position: relative; z-index:2" >
                 ${
                   des
-                    ? `<p style="color: #996666; font-size: 30px; padding-bottom: 30px" >${des}</p>`
+                    ? `<p style="color: #996666; font-size: ${
+                        this.isPc ? "30px" : "3vh"
+                      }; padding-bottom: ${
+                        this.isPc ? "30px" : "3vh"
+                      }" >${des}</p>`
                     : ""
                 }
                 <div>
@@ -474,14 +504,22 @@
                             >
                               ${
                                 item.title
-                                  ? `<p style="display: flex; padding-top: 60px" >
-                                      <span style="display: block; padding: 5px 15px; background-color: #C52518; color: #fff; border-radius: 5px; font-size: 40px" >${item.title}</span>
+                                  ? `<p style="display: flex; padding-top: ${
+                                      this.isPc ? "60px" : "3vh"
+                                    }" >
+                                      <span style="display: block; padding: 5px 15px; background-color: #C52518; color: #fff; border-radius: 5px; font-size: ${
+                                        this.isPc ? "40px" : "3vh"
+                                      }" >${item.title}</span>
                                      </p>`
                                   : ""
                               }
                               ${
                                 item.des
-                                  ? `<p style="color: #996666; font-size: 30px; padding: 40px 0 30px" >${item.des}</p>`
+                                  ? `<p style="color: #996666; font-size: ${
+                                      this.isPc ? "30px" : "2.5vh"
+                                    }; padding: ${
+                                      this.isPc ? "40px 0 30px" : "4vh 0 3vh"
+                                    }" >${item.des}</p>`
                                   : ""
                               }
                               <ul>
@@ -493,10 +531,14 @@
                                     return `<li>
                                         ${
                                           cItem.title
-                                            ? `<p style="color: #3782C2; font-size: 40px" >${cItem.title}</p>`
+                                            ? `<p style="color: #3782C2; font-size: ${
+                                                this.isPc ? "40px" : "3vh"
+                                              }" >${cItem.title}</p>`
                                             : ""
                                         }
-                                        <ul style="font-size: 35px; color:#6A0300" >
+                                        <ul style="font-size: ${
+                                          this.isPc ? "35px" : "2.5vh"
+                                        }; color:#6A0300" >
                                           ${Array.from(
                                             cItem.moreInfo &&
                                               Array.isArray(cItem.moreInfo)
@@ -504,7 +546,9 @@
                                               : [],
                                             (acItem, acIndex) => {
                                               return acItem
-                                                ? `<li style="padding-top: 20px" >${acItem}</li>`
+                                                ? `<li style="padding-top: ${
+                                                    this.isPc ? "20px" : "1.5vh"
+                                                  }" >${acItem}</li>`
                                                 : "";
                                             }
                                           ).join("")}
@@ -521,20 +565,20 @@
                 </div>
               </div>
             </div>
-            <div style="margin-left: -2px; margin-top: ${
-              this.isPc ? 0 : "-2px"
-            }" >
+            <div style="margin-left: ${
+              this.isPc ? "-2px" : "-1px"
+            }; margin-top: ${this.isPc ? 0 : "-3px"}" >
               <img src="https://gec.10010.com/multi/unified-storage/image/202101/21012511a27e657d2263.jpg" style="width: 100%; display: block" />
             </div>
            </div>
           `;
     }
 
-    domRender() {
+    domRender = () => {
       this.target.innerHTML = this.temRender();
       //   console.log(this.target);
       document.body.appendChild(this.target);
-    }
+    };
   }
   Promise.resolve()
     .then(() => {

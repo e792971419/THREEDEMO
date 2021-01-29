@@ -2,7 +2,7 @@
  * @Author: your name
  * @LastEditors: xiasong
  * @Date: 2021-01-26 16:01:07
- * @LastEditTime: 2021-01-28 12:24:05
+ * @LastEditTime: 2021-01-29 09:36:00
  * @Description: description
  * @FilePath: \THREEDEMO\src\special_zone\test2.js
  */
@@ -577,7 +577,9 @@
     domRender = () => {
       this.target.innerHTML = this.temRender();
       //   console.log(this.target);
-      document.body.appendChild(this.target);
+      const zone_main = document.getElementById("zone-main");
+      zone_main.appendChild(this.target);
+      // document.body.appendChild(this.target);
     };
   }
   Promise.resolve()

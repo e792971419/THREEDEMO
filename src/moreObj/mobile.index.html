@@ -1,0 +1,268 @@
+<!--
+ * @Author: your name
+ * @LastEditors: xiasong
+ * @Date: 2021-01-29 11:31:26
+ * @LastEditTime: 2021-01-29 15:44:27
+ * @Description: description https://juejin.cn/post/6921886428158754829
+ * @FilePath: \THREEDEMO\src\moreObj\mobile.index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="pig.jpg"
+      media="(device-width: 375px)"
+    />
+
+    <!-- 强制QQ浏览器竖屏 -->
+    <meta name="x5-orientation" content="portrait" />
+    <!-- 没啥用  -->
+
+    <!-- 强制QQ浏览器全屏 -->
+    <!-- <meta name="x5-fullscreen" content="true"> -->
+
+    <!-- 开启QQ浏览器应用模式 -->
+    <meta name="x5-page-mode" content="app" />
+
+    <!-- 强制UC浏览器竖屏 -->
+    <meta name="screen-orientation" content="portrait" />
+
+    <!-- 强制UC浏览器全屏 -->
+    <meta name="full-screen" content="yes" />
+
+    <!-- 开启UC浏览器应用模式 -->
+    <meta name="browsermode" content="application" />
+
+    <!-- 开启360浏览器极速模式 -->
+    <meta name="renderer" content="webkit" />
+
+    <title>mobile test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+
+        /* 多数情况会使用JS换行文本，那就真的Out了。若接口返回字段包含\n或<br>，千万别替换掉，可声明white-space:pre-line交由浏览器做断行处理。 */
+        /* white-space: pre-line; 不太适合 */
+
+        text-size-adjust: 100%; /* 旋转屏幕可能会改变字体大小，声明text-size-adjust:100%让字体大小保持不变。没效果 */
+        /* 禁止复制这个暂时没有效果 */
+        user-select: none; /* 禁止长按选择文字 */
+        -webkit-touch-callout: none;
+      }
+      /* html {
+        font-size: calc(50vw / 7.5);
+      } */
+
+      body {
+        -webkit-overflow-scrolling: touch;
+        padding-right: calc(100vw - 100%);
+      }
+
+      input,
+      textarea {
+        user-select: auto;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        appearance: none;
+        /* 自定义样式 */
+      }
+
+      input {
+        line-height: normal;
+      }
+
+      input::-webkit-input-placeholder {
+        color: #66f;
+      }
+
+      select option {
+        direction: ltr;
+      }
+
+      #elem {
+        position: relative;
+        overflow: auto;
+        overscroll-behavior: contain;
+
+        /* 在移动设备上添加动画，多数情况会出现闪屏，给动画元素的父元素构造一个3D环境就能让动画稳定运行了。 */
+        perspective: 1000;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+      }
+
+      /* #elem::after {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border: 1px solid #f66;
+        width: 100%;
+        height: 100%;
+        content: "";
+        transform: scale(1);
+        transform-origin: left top;
+      } */
+
+      #test {
+        font-size: 20px;
+      }
+      #goto_top {
+        position: fixed;
+        right: 3rem;
+        bottom: 3rem;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: orange;
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      @media screen and (max-width: 1024px) {
+        html {
+          font-size: calc(50vw / 7.5 / 3 * 2);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="elem">
+      <div id="goto_top">Top</div>
+      <img
+        class="lazyload"
+        data-src="../image/special_zone/bg_top.jpg"
+        style="width: 100%"
+      />
+
+      <a href="tel:10086">拨打电话给10086</a>
+      <!-- <br /> -->
+      <a href="sms:10086">发短信给10086</a>
+      <br />
+      <input type="file" accept="image/*" />
+      <br />
+      <input type="tel" />
+      <!-- 纯数字 带# * -->
+      <br />
+
+      <input type="number" pattern="\d" placeholder="num" />
+      <!-- 纯数字 -->
+      <br />
+
+      <select style="width: 50%">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+      </select>
+
+      <br />
+
+      <!-- 打开微信 -->
+      <a href="weixin://">打开微信</a>
+      <br />
+
+      <!-- 打开支付宝 -->
+      <a href="alipays://">打开支付宝</a>
+      <br />
+
+      <!-- 打开支付宝的扫一扫 -->
+      <a href="alipays://platformapi/startapp?saId=10000007"
+        >打开支付宝的扫一扫</a
+      >
+      <br />
+
+      <!-- 打开支付宝的蚂蚁森林 -->
+      <a href="alipays://platformapi/startapp?appId=60000002"
+        >打开支付宝的蚂蚁森林</a
+      >
+      <br />
+
+      <input autocapitalize="off" autocorrect="off" />
+
+      <br />
+
+      <div style="font-size: 20px">test</div>
+      <div style="font-size: 1rem">test</div>
+      <div id="test">test</div>
+      <div style="height: 700px; width: 100%; background-color: skyblue"></div>
+      <img
+        class="lazyload"
+        data-src="../image/special_zone/bd_title2.jpg"
+        style="width: 100%"
+      />
+
+      <div id="bottom"></div>
+    </div>
+    <script src="../special_zone/axios.min.js"></script>
+    <script>
+      function AutoResponse(width = 750) {
+        const target = document.documentElement;
+        console.log(target.clientWidth);
+        if (target.clientWidth >= 600) {
+          target.style.fontSize = "80px";
+        } else {
+          target.style.fontSize =
+            (target.clientWidth / (width * 2 * 1.5)) * 100 + "px";
+        }
+      }
+      // AutoResponse();
+      // window.addEventListener("resize", () => AutoResponse());
+
+      /* 简化回到顶部 */
+      const gotopBtn = document.getElementById("goto_top");
+      gotopBtn.addEventListener("click", () =>
+        document.body.scrollIntoView({ behavior: "smooth" })
+      );
+
+      // 图片懒加载
+      const imgs = document.querySelectorAll("img.lazyload");
+      const observer = new IntersectionObserver((nodes) => {
+        nodes.forEach((v) => {
+          if (v.isIntersecting) {
+            // 判断是否进入可视区域
+            v.target.src = v.target.dataset.src; // 赋值加载图片
+            observer.unobserve(v.target); // 停止监听已加载的图片
+          }
+        });
+      });
+      imgs.forEach((v) => observer.observe(v));
+
+      // 实现一个滑倒可视处 去请求然后 渲染请求回来的东西
+      const bottom = document.getElementById("bottom");
+      const observerRequest = new IntersectionObserver((nodes) => {
+        // const tgt = nodes[0]; // 反正只有一个
+        // if (tgt.isIntersecting) {
+        //   console.log(tgt);
+        //   console.log("已到底部，请求接口");
+        //   observerRequest.unobserve(tgt);
+        //   // 执行接口请求代码
+        // }
+        nodes.forEach((v) => {
+          if (v.isIntersecting) {
+            axios("./index2.json").then((res) => {
+              const str = `<ul>${Array.from(
+                res.data && Array.isArray(res.data) ? res.data : [],
+                (item) => `<li>${item.title}</li>`
+              ).join("")}</ul>`;
+              v.target.innerHTML = str;
+            });
+            // console.log(v);
+            observerRequest.unobserve(v.target);
+          }
+        });
+      });
+      observerRequest.observe(bottom);
+    </script>
+  </body>
+</html>
